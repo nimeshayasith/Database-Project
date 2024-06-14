@@ -1,0 +1,17 @@
+db.Student.count({"Module" : {"code": "EE4202", Grade: "A"}})
+
+db.Student.updateOne({Name : "Sunil"}, {$set : {Age : 30}})// These are the some formatting inthe mongo db
+
+db.Student.deleteMany({Age:23}) // delete all the data of age 23
+
+db.Student.deleteOne({Name : "Nimal"}) // delete one of the row in the database
+
+
+
+cassandra
+commands
+cqlsh- cassandra query family language
+
+
+
+match(x:Person{name:"Nalin"}),(y:Person{name:"Kamal"}) merge(x)-[r:associate{nature:"Neutral"}]->y

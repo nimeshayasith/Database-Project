@@ -1,0 +1,209 @@
+1.Log in as root.
+ 
+SYSTEM mysql -u root -p
+
+
+To list the users
+select user from mysql.user; 
+
+To check the current user
+select current_user();
+
+2. Create 8 users as user1, user2, …., user8 with passwords pwd1, pwd2,……, pwd8 respectively.
+
+create user if not exists user1 identified by 'pwd1';
+
+3. Remove user8
+
+drop user user8;
+
+4. Change the password of user1 as PWD1 and set a password expire interval of 120 days.
+
+alter user user1 idetified by 'PWD1';
+
+alter user if exists user1 identified by'pwd1' password expire interval 120 day;
+
+5. Create 4 roles as role1, role2, role3 and role4
+
+create role role1;
+
+6. Remove role4
+
+Drop role role4;
+
+7. Grant insert, update, delete privileges on all tables to role1 without grant option
+
+grant insert, update, delete on *.* to role1;            
+
+8.Grant select privilege only on all tables for role2 with grant option.
+
+grant select on *.* to role2 with grant option;
+
+9. Grant role1 to user1, user2 with admin option,  role2 to user3, user4 and role3 to user5, user6 without admin option.
+
+grant role1 to user1 with admin option;
+grant role1 to user2 with admin option;
+
+grant role2 to user3;
+grant role2 to user4;
+
+grant role3 to user5;
+grant role3 to user6;
+
+10.  Log into each user and set the granted roles as their default roles.
+
+exit
+system mysql -u user1 -p;
+set role role1;                             - to specify the default role of a specific user
+
+
+11. Login as user1 and check whether you can grant role1 to user7.  check whether you can grant role2 to user7 from user1.
+
+system mysql -u user1 -p;
+grant role1 to user7;
+
+12. Revoke the granted role from user7. Now grant all privileges to user7 from root account without grant options.
+
+revoke role1 from user7;
+
+exit
+system mysql -u root -p;
+grant all privileges on *.* to user7;            
+
+13. Login as user4 and grant select privilege to role 3 without grant option.
+
+SYSTEM mysql -u user4 -p
+set role role2;
+grant select on *.* to role3;
+
+14.Now login as user6. Set role as role3.
+
+SYSTEM mysql -u user6 -p
+set role role3;
+
+15. Check the select privilege by selecting all data in employee table
+
+select * from eie_ce_22.employee;
+
+16.Try to insert a row in employee table as user4
+
+SYSTEM mysql -u user4 -p
+insert into eie_ce_22.employee values ('EE004','EIE', 'Software','Lecturer', 30, '2019-03-02', '10:00:00', true, 011011, 10);
+
+
+17. Now, login as user2 and try to select all records in employee table? 
+
+system mysql -u user2 -p;
+select * from eie_ce_22.employee;
+ 
+ 
+18. Add a new row to employee table with some values?
+set role role1;
+insert into eie_ce_22.employee values ('EE008','EIE', 'Software','Lecturer', 30, '2019-03-02', '10:00:00', true, 011011, 10);
+
+19. Now, login as administrator (root) and revoke the select privilege, grant option granted to role2?
+ 
+system mysql -u root -p
+revoke select,grant option on *.* from role2;
+
+20. Now, login as user5, set role as role3 and check whether you can select all rows in employee table?  
+
+system mysql -u user5 -p                        
+select * from eie_ce_22.employee;            
+
+21. Now, login as user3, set role as role2 and check whether you can select all rows in employee table?
+
+system mysql -u user3 -p
+select * from eie_ce_22.employee;                 
+
+22. Log back as administrator and create a new user user8.
+
+system mysql -u root -p
+create user user8 identified by 'pwd8';
+
+23. Log in as user2 and grant insert to user8. grant role1 to user8?
+
+system mysql -u user2 -p
+grant insert on *.* to user8;              
+
+grant role1 to user8;                   
+
+24. Now log back to root account and provide full object privileges to all roles?
+
+system mysql -u root -p
+grant all privileges on *.* to role1;
+grant all privileges on *.* to role2;
+grant all privileges on *.* to role3;
+
+
+1. Login as user2. Disable auto commit feature.
+
+system mysql -u user2 -p
+set autocommit=0;
+
+2. Then,  begin a transaction. Create a savepoint as savA. 
+
+start transaction;                     
+savepoint save1;                      
+
+select * from eie_ce_22.employee;
+
+3. update Dept_ID as CEE where Empl_ID=‘EE001’.  Show all rows of employee table.
+ 
+update eie_ce_22.employee set Dept_ID='CEE' where Empl_ID = 'EE001';
+
+4. Create savepoint as savB
+
+savepoint save2;
+select * from eie_ce_22.employee;                          
+
+5. update Dept_ID as CEE where Empl_ID=‘EE002’.  Show all rows of employee table
+
+update eie_ce_22.employee set Dept_ID='CEE' where Empl_ID = 'EE002';
+select * from eie_ce_22.employee;                       
+
+6. Now rollback the transaction to savepoint savB and show all rows of employee table
+													
+rollback to save2;                                            
+select * from eie_ce_22.employee;    
+
+7. Rollback the transaction to savepoint savA and show all rows of employee table
+
+rollback to save1;                                                        
+select * from eie_ce_22.employee;  
+
+8. Rollback the transaction to savepoint savB now
+
+rollback to save2;  
+
+9. Commit the transaction
+
+commit;                              
+
+10. Then,  begin a transaction. Create a savepoint as savC. 
+
+start transaction;
+savepoint save3;
+
+11. update Dept_ID as CEE where Empl_ID=‘EE004’.  
+Now log off from user2 and log into user3. Show all rows of employee table
+
+update eie_ce_22.employee set Dept_ID = 'CEE' where Empl_ID='EE004';
+exit
+system mysql -u user3 -p
+select * from eie_ce_22.employee;                     
+
+12. Now start a new transaction and create savepoint as savepoint savD.
+
+start transaction;
+savepoint save4;
+
+13. update Dept_ID as CEE where Empl_ID=‘EE004’. 
+Commit the transaction. Now log off and log in as use6 and view the table
+
+update eie_ce_22.employee set Dept_ID = 'CEE' where Empl_ID='EE002';
+commit;
+exit
+system mysql -u user6 -p
+select * from eie_ce_22.employee;
+
